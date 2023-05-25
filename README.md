@@ -6,10 +6,28 @@ There are two branches: Spatial-Visium and sNuc-Chromium. R scripts for these an
 Each figure within the manuscript also has a corresponding code file in the main branch.
 Our data is available as Seurat object .RDS files for download at: [INSERT LINK HERE].
 
-We mainly used the following packages:
-
-
-
+The following packages are required:
+"Seurat"
+"ggplot2"
+"patchwork"
+"dplyr"
+"here"
+"tidyverse"
+"viridis"
+"lattice"
+"reshape2"
+"cowplot"
+"Matrix"
+"Matrix.utils"
+"edgeR"
+"S4Vectors"
+"SingleCellExperiment"
+"pheatmap"
+"apeglm"
+"png"
+"DESeq2"
+"RColorBrewer"
+"data.table"
 
 
 Please reach out to Karen Serrano at karenserrano@lbl.gov or Margot Bezrutcyzk at mbezrutczyk@lbl.gov for any questions.
