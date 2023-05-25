@@ -1,1 +1,100 @@
+```{r}
+#This is the script for spatial object integration and analysis
+#loading in the necessary packages
+##the last line here is a workaround for memory requirements Mac
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+library(dplyr)
+library(here)
+library(tidyverse)
+library(viridis)
+library(RColorBrewer)
+library(Seurat.utils)
+options (future.globals.maxSize = 4000 * 1024^5)
+```
+```{r}
+#loading in spatial objects
+B1 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/B1.rds')
+A2 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/A2.rds')
+B2 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/B2.rds')
+C2 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/C2.rds')
+D2 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/D2.rds')
+A3 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/A3.rds')
+B3 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/B3.rds')
+C3 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/C3.rds')
+D3 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/D3.rds')
+A4 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/A4.rds')
+B4 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/B4.rds')
+C4 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/C4.rds')
+D4 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/D4.rds')
+A5 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/A5.rds')
+B5 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/B5.rds')
+C5 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/C5.rds')
+D5 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/D5.rds')
 
+#assigning objects to lists for integration
+wt.list <-c(B1,A2,B2,C2,D2,A3,B3,C3,D3,A4,B4,C4,D4,A5,B5,C5,D5)
+myc.list <- c(B1,A2,B2,C2,D2,A3,B3,C3,D3)
+ctrl.list <- c(A4,B4,C4,D4,A5,B5,C5,D5)
+```
+```{r}
+#prepping for integration, selecting features to keep
+wt.features <- SelectIntegrationFeatures(wt.list, nfeatures = 3000)
+myc.features <- SelectIntegrationFeatures(myc.list, nfeatures = 3000)
+ctrl.features <- SelectIntegrationFeatures(ctrl.list, nfeatures = 3000)
+
+#getting a list of all unique genes from each list for use as anchors later
+all.wt.genes <- lapply(wt.list, row.names) %>% Reduce(c, .) %>% unique()
+all.myc.genes <- lapply(myc.list, row.names) %>% Reduce(c, .) %>% unique()
+all.ctrl.genes <- lapply(ctrl.list, row.names) %>% Reduce(c, .) %>% unique()
+
+#prepSCTIntegration
+wt.list <-PrepSCTIntegration(wt.list, assay = NULL, anchor.features=wt.features, sct.clip.range = NULL,verbose = TRUE)
+myc.list <-PrepSCTIntegration(myc.list, assay = NULL, anchor.features=myc.features, sct.clip.range = NULL,verbose = TRUE)
+ctrl.list <-PrepSCTIntegration(ctrl.list, assay = NULL, anchor.features=ctrl.features, sct.clip.range = NULL,verbose = TRUE)
+```
+```{r}
+#finding anchors for all datasets
+wt.anchors <- FindIntegrationAnchors(object.list = wt.list, normalization.method = "SCT", anchor.features = wt.features, verbose = FALSE)
+myc.anchors <- FindIntegrationAnchors(object.list = myc.list, normalization.method = "SCT", anchor.features = myc.features, verbose = FALSE)
+ctrl.anchors <- FindIntegrationAnchors(object.list = ctrl.list, normalization.method = "SCT", anchor.features = ctrl.features, verbose = FALSE)
+```
+```{r}
+# specify that we will perform downstream analysis on the corrected data note that the
+# original unmodified data still resides in the 'RNA' assay
+DefaultAssay(wt.integrated) <- "integrated"
+DefaultAssay(myc.integrated) <- "integrated"
+DefaultAssay(ctrl.integrated) <- "integrated"
+
+# Run the standard workflow for visualization and clustering
+wt.integrated <- RunPCA(wt.integrated, npcs = 30, verbose = FALSE)
+wt.integrated <- RunUMAP(wt.integrated, reduction = "pca",verbose = FALSE, dims = 1:30, metric ="cosine")
+wt.integrated <- FindNeighbors(wt.integrated, reduction = "pca", dims = 1:30)
+wt.integrated <- FindClusters(wt.integrated, resolution = 0.5)
+
+# Run the standard workflow for visualization and clustering
+myc.integrated <- RunPCA(myc.integrated, npcs = 30, verbose = FALSE)
+myc.integrated <- RunUMAP(myc.integrated, reduction = "pca",verbose = FALSE, dims = 1:30, metric ="cosine")
+myc.integrated <- FindNeighbors(myc.integrated, reduction = "pca", dims = 1:30)
+myc.integrated <- FindClusters(myc.integrated, resolution = 0.5)
+
+# Run the standard workflow for visualization and clustering
+ctrl.integrated <- RunPCA(ctrl.integrated, npcs = 30, verbose = FALSE)
+ctrl.integrated <- RunUMAP(ctrl.integrated, reduction = "pca",verbose = FALSE, dims = 1:30, metric ="cosine")
+ctrl.integrated <- FindNeighbors(ctrl.integrated, reduction = "pca", dims = 1:30)
+ctrl.integrated<- FindClusters(ctrl.integrated, resolution = 0.5)
+```
+```{r}
+p00 <- DimPlot(wt.integrated, reduction = "umap")
+p01 <- DimPlot(wt.integrated, reduction = "umap", group.by = "orig.ident")
+p00+p01
+
+p02 <- DimPlot(myc.integrated, reduction = "umap")
+p03 <- DimPlot(myc.integrated, reduction = "umap", group.by = "orig.ident")
+p02+p03
+
+p04 <- DimPlot(ctrl.integrated, reduction = "umap")
+p05 <- DimPlot(ctrl.integrated, reduction = "umap", group.by = "orig.ident")
+p04+p05
+```
