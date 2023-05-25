@@ -1,1 +1,696 @@
+---
+title: "Spatial_Object_Manipulation"
+author: "Karen Serrano"
+date: "2023-05-25"
+output: html_document
+---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+#loading in the necessary packages
+##the last line here is a workaround for memory requirements Mac
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+library(dplyr)
+library(here)
+library(tidyverse)
+library(viridis)
+library(RColorBrewer)
+library(Seurat.utils)
+options (future.globals.maxSize = 4000 * 1024^5)
+```
+```{r}
+#Loading in all capture area spaceranger output files using the here package to specify paths on local computer.
+## Each VGE slide was assigned a number 1-5.
+##V11Y10-339 = Slide 1 [mycorrhizal]
+##V11Y10-341 = Slide 2 [mycorrhizal]
+##V11M22-399 = Slide 3 [mycorrhizal]
+##V11M22-398 = Slide 4 [control] 
+##V11M22-401 = Slide 5 [control]
+##Thus, each spatial object for each capture area was named for the capture area letter code and the slide number
+##As an example, Capture Area "B1" from slide V11Y10-339 or slide 1, is named "B1", while Capture Area "B1" from slide V11Y10-341 or slide 2, is named "B2".
+
+#B1 from V11Y10-339 - Mycorrhizal
+B1dataDir1<-here("V11Y10-339/B1")
+B1<-Load10X_Spatial(data.dir = B1dataDir1, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+B1@meta.data['Section_ID'] = 'B1'
+
+#A1 from V11Y10-341 - Mycorrhizal 
+A1dataDir2<-here("V11Y10-341/A1")
+A2<-Load10X_Spatial(data.dir = A1dataDir2, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+A2@meta.data['Section_ID'] = 'A1'
+#B1 from V11Y10-341 - Mycorrhizal 
+B1dataDir2<-here("V11Y10-341/B1")
+B2<-Load10X_Spatial(data.dir = B1dataDir2, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+B2@meta.data['Section_ID'] = 'B1'
+#C1 from V11Y10-341 - Mycorrhizal 
+C1dataDir2<-here("V11Y10-341/C1")
+C2<-Load10X_Spatial(data.dir = C1dataDir2, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+C2@meta.data['Section_ID'] = 'C1'
+#D1 from V11Y10-341 - Mycorrhizal 
+D1dataDir2<-here("V11Y10-341/D1")
+D2<-Load10X_Spatial(data.dir = D1dataDir2, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+D2@meta.data['Section_ID'] = 'D1'
+
+#A1 from V11M22-399 - Mycorrhizal
+A1dataDir3<-here("V11M22-399_dont/A1")
+A3<-Load10X_Spatial(data.dir = A1dataDir3, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+A3@meta.data['Section_ID'] = 'A1'
+#B1 from V11M22-399 - Mycorrhizal
+B1dataDir3<-here("V11M22-399_dont/B1")
+B3<-Load10X_Spatial(data.dir = B1dataDir2, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+B3@meta.data['Section_ID'] = 'B1'
+#C1 from V11M22-399 - Mycorrhizal
+C1dataDir3<-here("V11M22-399_dont/C1")
+C3<-Load10X_Spatial(data.dir = C1dataDir3, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+C3@meta.data['Section_ID'] = 'C1'
+#C1 from V11M22-399 - Mycorrhizal
+D1dataDir3<-here("V11M22-399_dont/D1")
+D3<-Load10X_Spatial(data.dir = D1dataDir2, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+D3@meta.data['Section_ID'] = 'D1'
+
+#A1 from V11M22-398 - Control
+A1dataDir4<-here("V11M22-398/A1")
+A4<-Load10X_Spatial(data.dir = A1dataDir4, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+A4@meta.data['Section_ID'] = 'A1'
+#B1 from V11M22-398 - Control
+B1dataDir4<-here("V11M22-398/B1")
+B4<-Load10X_Spatial(data.dir = B1dataDir4, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+B4@meta.data['Section_ID'] = 'B1'
+#C1 from V11M22-398 - Control
+C1dataDir4<-here("V11M22-398/C1")
+C4<-Load10X_Spatial(data.dir = C1dataDir4, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+C4@meta.data['Section_ID'] = 'C1'
+#D1 from V11M22-398 - Control
+D1dataDir4<-here("V11M22-398/D1")
+D4<-Load10X_Spatial(data.dir = D1dataDir4, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+D4@meta.data['Section_ID'] = 'D1'
+
+#A1 from V11M22-401 - Control
+A1dataDir5<-here("V11M22-401/A1")
+A5<-Load10X_Spatial(data.dir = A1dataDir5, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+A5@meta.data['Section_ID'] = 'A1'
+#B1 from V11M22-401 - Control
+B1dataDir5<-here("V11M22-401/B1")
+B5<-Load10X_Spatial(data.dir = B1dataDir5, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+B5@meta.data['Section_ID'] = 'B1'
+#C1 from V11M22-401 - Control
+C1dataDir5<-here("V11M22-401/C1")
+C5<-Load10X_Spatial(data.dir = C1dataDir5, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+C5@meta.data['Section_ID'] = 'C1'
+#D1 from V11M22-401 - Control
+D1dataDir5<-here("V11M22-401/D1")
+D5<-Load10X_Spatial(data.dir = D1dataDir5, assay='Spatial', filename = "filtered_feature_bc_matrix.h5")
+D5@meta.data['Section_ID'] = 'D1'
+```
+```{r}
+#Now that our capture areas are Seurat objects, we can proceed to filtering and normalization.
+#From the raw expression values, we selected 13 outlier ribosomal features to remove from all of the datasets prior to merged filtering
+##removing these features from the counts for each capture area prior to full filtering steps
+counts <- GetAssayData(B1, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  B1 <- subset(B1, features = rownames(counts))
+  
+counts <- GetAssayData(A2, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  A2 <- subset(A2, features = rownames(counts))
+  
+counts <- GetAssayData(B2, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  B2 <- subset(B2, features = rownames(counts))
+  
+counts <- GetAssayData(C2, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  C2 <- subset(C2, features = rownames(counts))  
+  
+counts <- GetAssayData(D2, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  D2 <- subset(D2, features = rownames(counts))
+  
+counts <- GetAssayData(A3, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  A3 <- subset(A3, features = rownames(counts))
+  
+counts <- GetAssayData(B3, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  B3 <- subset(B3, features = rownames(counts))
+  
+counts <- GetAssayData(C3, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  C3 <- subset(C3, features = rownames(counts))  
+  
+counts <- GetAssayData(D3, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  D3 <- subset(D3, features = rownames(counts))
+  
+counts <- GetAssayData(A4, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  A4 <- subset(A4, features = rownames(counts))
+  
+counts <- GetAssayData(B4, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  B4 <- subset(B4, features = rownames(counts))
+  
+counts <- GetAssayData(C4, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  C4 <- subset(C4, features = rownames(counts))  
+  
+counts <- GetAssayData(D4, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  D4 <- subset(D4, features = rownames(counts))
+  
+counts <- GetAssayData(A5, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  A5 <- subset(A5, features = rownames(counts))
+  
+counts <- GetAssayData(B5, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  B5 <- subset(B5, features = rownames(counts))
+  
+counts <- GetAssayData(C5, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  C5 <- subset(C5, features = rownames(counts))  
+  
+counts <- GetAssayData(D5, assay = "Spatial")
+  counts <- counts[-(which(rownames(counts) %in% c('A17-----------LSU-rRNA-eukarya.17','A17-----------LSU-rRNA-eukarya.16','A17-----------LSU-rRNA-eukarya.7','A17-----------SSU-rRNA-eukarya.5','A17-----------SSU-rRNA-eukarya.4','A17-----------LSU-rRNA-eukarya.20', "A17-----------SSU-rRNA-eukarya", 'R.irregularis-RIR-2468470','R.irregularis-RIR-1548030','R.irregularis-RIR-2275770','R.irregularis-RIR-0708530','R.irregularis-RIR-0708570', "R.irregularis-RIR-1508070"))),]
+  D5 <- subset(D5, features = rownames(counts))  
+```
+```{r}
+##First We want to merge all the capture areas into a single merged object since working with each one is laborious, called that object "alldata"
+##Visium experiments tend to display a high capture rate of ribosomal RNA. 
+##To account for this, we first need to assess the percentage of ribosomal RNA expression across the capture areas.
+##We used the ribosomal RNA identifier "[LS]SU-rRNA" to get the percentage of transcripts with that identifer per voxel and added that percentage to the metadata.
+##We were also curious about the breakdown of R. irregularis vs M. truncatula transcripts in each voxel, so we used the "A17-----------MTR" and "R.irregularis-RIR" identifiers for that
+alldata <- merge(B1, c(A2, B2, C2, D2, A3, B3, C3, D3, A4, B4, C4, D4, A5, B5, C5, D5), add.cell.ids = c("B1", "A2", "B2", "C2", "D2", "A3", "B3", "C3", "D3", "A4","B4","C4","D4", "A5", "B5", "C5", "D5"))
+#The calculation here is simply the column sum of the matrix present in the counts slot for features belonging to the set divided by the column sum for all features times 100.
+alldata <- PercentageFeatureSet(
+  alldata,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.fungal",
+  assay = NULL)
+
+alldata <- PercentageFeatureSet(
+  alldata,
+  pattern = "A17-----------MTR",
+  features = NULL,
+  col.name = "percent.plant",
+  assay = NULL)
+
+alldata <- PercentageFeatureSet(
+  alldata,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+```
+```{r}
+#Let's make all of the statistics we're interested in into a list and visualize each of these stats in a volcano plot
+stats <- c("nFeature_Spatial", "nCount_Spatial", "percent.plant", "percent.fungal", "percent.rb")
+VlnPlot(alldata, group.by = "orig.ident", features = stats, pt.size = 0.1, ncol = 3) + NoLegend()
+```
+```{r}
+#let's filter out some of the outliers based on these volcano plots
+##this may be different depending on capture area which is why we are using the inidividual objects rather than the merged
+##First filtering for feature counts
+B1 <- subset(B1, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+A2 <- subset(A2, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+B2 <- subset(B2, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+C2 <- subset(C2, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+D2 <- subset(D2, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+A3 <- subset(A3, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+B3 <- subset(B3, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+C3 <- subset(C3, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+D3 <- subset(D3, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+A4 <- subset(A4, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+B4 <- subset(B4, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+D4 <- subset(C4, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+A4 <- subset(D4, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+A5 <- subset(A5, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+B5 <- subset(B5, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+C5 <- subset(C5, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+D5 <- subset(D5, subset = nFeature_Spatial > 100 & nFeature_Spatial < 10000)
+
+#now umi counts
+B1 <- subset(B1, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+A2 <- subset(A2, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+B2 <- subset(B2, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+C2 <- subset(C2, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+D2 <- subset(D2, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+A3 <- subset(A3, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+B3 <- subset(B3, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+C3 <- subset(C3, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+D3 <- subset(D3, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+A4 <- subset(A4, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+B4 <- subset(B4, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+D4 <- subset(C4, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+A4 <- subset(D4, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+A5 <- subset(A5, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+B5 <- subset(B5, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+C5 <- subset(C5, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+D5 <- subset(D5, subset = nCount_Spatial > 0 & nCount_Spatial < 60000)
+
+#now ribosomal RNA
+##for this we have to add the PercentFeatureSet to each capture area first since we only added it to the merged dataset
+B1 <- PercentageFeatureSet(
+  B1,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+A2 <- PercentageFeatureSet(
+  A2,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+B2 <- PercentageFeatureSet(
+  B2,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+C2 <- PercentageFeatureSet(
+  C2,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+D2 <- PercentageFeatureSet(
+  D2,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+A3 <- PercentageFeatureSet(
+  A3,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+B3 <- PercentageFeatureSet(
+  B3,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+C3 <- PercentageFeatureSet(
+  C3,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+D3 <- PercentageFeatureSet(
+  D3,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+A4 <- PercentageFeatureSet(
+  A4,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+B4 <- PercentageFeatureSet(
+  B4,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+C4 <- PercentageFeatureSet(
+  C4,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+D4 <- PercentageFeatureSet(
+  D4,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+A5 <- PercentageFeatureSet(
+  A5,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+B5 <- PercentageFeatureSet(
+  B5,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+C5 <- PercentageFeatureSet(
+  D5,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+D5 <- PercentageFeatureSet(
+  D5,
+  pattern = "A17-----------[LS]SU-rRNA",
+  features = NULL,
+  col.name = "percent.rb",
+  assay = NULL)
+
+#adding in metadata per capture area
+B1 <- PercentageFeatureSet(
+  B1,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+A2 <- PercentageFeatureSet(
+  A2,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+B2 <- PercentageFeatureSet(
+  B2,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+C2 <- PercentageFeatureSet(
+  C2,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+D2 <- PercentageFeatureSet(
+  D2,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+A3 <- PercentageFeatureSet(
+  A3,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+B3 <- PercentageFeatureSet(
+  B3,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+C3 <- PercentageFeatureSet(
+  C3,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+D3 <- PercentageFeatureSet(
+  D3,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+A4 <- PercentageFeatureSet(
+  A4,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+B4 <- PercentageFeatureSet(
+  B4,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+C4 <- PercentageFeatureSet(
+  C4,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+D4 <- PercentageFeatureSet(
+  D4,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+A5 <- PercentageFeatureSet(
+  A5,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+B5 <- PercentageFeatureSet(
+  B5,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+C5 <- PercentageFeatureSet(
+  D5,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+
+D5 <- PercentageFeatureSet(
+  D5,
+  pattern = "R.irregularis-RIR",
+  features = NULL,
+  col.name = "percent.ri",
+  assay = NULL)
+selected_ribo <- WhichCells(B1, expression = percent.rb < 30)
+B1 <- subset(B1, cells = selected_ribo)
+selected_ribo <- WhichCells(A2, expression = percent.rb < 30)
+A2 <- subset(A2, cells = selected_ribo)
+selected_ribo <- WhichCells(B2, expression = percent.rb < 30)
+B2 <- subset(B2, cells = selected_ribo)
+selected_ribo <- WhichCells(C2, expression = percent.rb < 30)
+C2 <- subset(C2, cells = selected_ribo)
+selected_ribo <- WhichCells(D2, expression = percent.rb < 30)
+D2 <- subset(D2, cells = selected_ribo)
+selected_ribo <- WhichCells(A3, expression = percent.rb < 30)
+A3 <- subset(A3, cells = selected_ribo)
+selected_ribo <- WhichCells(B3, expression = percent.rb < 30)
+B3 <- subset(B3, cells = selected_ribo)
+selected_ribo <- WhichCells(C3, expression = percent.rb < 30)
+C3 <- subset(C3, cells = selected_ribo)
+selected_ribo <- WhichCells(D3, expression = percent.rb < 30)
+D3 <- subset(D3, cells = selected_ribo)
+selected_ribo <- WhichCells(A4, expression = percent.rb < 30)
+A4 <- subset(A4, cells = selected_ribo)
+selected_ribo <- WhichCells(B4, expression = percent.rb < 30)
+B4 <- subset(B4, cells = selected_ribo)
+selected_ribo <- WhichCells(C4, expression = percent.rb < 30)
+C4 <- subset(C4, cells = selected_ribo)
+selected_ribo <- WhichCells(D4, expression = percent.rb < 30)
+D4 <- subset(D4, cells = selected_ribo)
+selected_ribo <- WhichCells(A5, expression = percent.rb < 30)
+A5 <- subset(A5, cells = selected_ribo)
+selected_ribo <- WhichCells(B5, expression = percent.rb < 30)
+B5 <- subset(B5, cells = selected_ribo)
+selected_ribo <- WhichCells(C5, expression = percent.rb < 30)
+C5 <- subset(C5, cells = selected_ribo)
+selected_ribo <- WhichCells(D5, expression = percent.rb < 30)
+D5 <- subset(D5, cells = selected_ribo)
+```
+```{r}
+#after filtering is done, let's normalize the data using SCT Transform
+#SCT builds regularized negative binomial models of gene expression in order to account for technical artifacts while preserving biological variance. 
+#SCTransform normalizes the data, detects high-variance features, and stores the data in the SCT assay. No need to scale before clustering when using.
+B1 <- SCTransform(B1, assay = "Spatial", verbose = FALSE)
+A2 <- SCTransform(A2, assay = "Spatial", verbose = FALSE)
+B2 <- SCTransform(B2, assay = "Spatial", verbose = FALSE)
+C2 <- SCTransform(C2, assay = "Spatial", verbose = FALSE)
+D2 <- SCTransform(D2, assay = "Spatial", verbose = FALSE)
+A3 <- SCTransform(A3, assay = "Spatial", verbose = FALSE)
+B3 <- SCTransform(B3, assay = "Spatial", verbose = FALSE)
+C3 <- SCTransform(C3, assay = "Spatial", verbose = FALSE)
+D3 <- SCTransform(D3, assay = "Spatial", verbose = FALSE)
+A4 <- SCTransform(A4, assay = "Spatial", verbose = FALSE)
+B4 <- SCTransform(B4, assay = "Spatial", verbose = FALSE)
+C4 <- SCTransform(C4, assay = "Spatial", verbose = FALSE)
+D4 <- SCTransform(D4, assay = "Spatial", verbose = FALSE)
+A5 <- SCTransform(A5, assay = "Spatial", verbose = FALSE)
+B5 <- SCTransform(B5, assay = "Spatial", verbose = FALSE)
+C5 <- SCTransform(C5, assay = "Spatial", verbose = FALSE)
+D5 <- SCTransform(D5, assay = "Spatial", verbose = FALSE)
+
+#Now we can perform dimensionality reduction and clustering for each capture area.
+B1 <- RunPCA(B1, assay = "SCT", verbose = FALSE)
+A2 <- RunPCA(A2, assay = "SCT", verbose = FALSE)
+B2 <- RunPCA(B2, assay = "SCT", verbose = FALSE)
+C2 <- RunPCA(C2, assay = "SCT", verbose = FALSE)
+D2 <- RunPCA(D2, assay = "SCT", verbose = FALSE)
+A3 <- RunPCA(A3, assay = "SCT", verbose = FALSE)
+B3 <- RunPCA(B3, assay = "SCT", verbose = FALSE)
+C3 <- RunPCA(C3, assay = "SCT", verbose = FALSE)
+D3 <- RunPCA(D3, assay = "SCT", verbose = FALSE)
+A4 <- RunPCA(A4, assay = "SCT", verbose = FALSE)
+B4 <- RunPCA(B4, assay = "SCT", verbose = FALSE)
+C4 <- RunPCA(C4, assay = "SCT", verbose = FALSE)
+D4 <- RunPCA(D4, assay = "SCT", verbose = FALSE)
+A5 <- RunPCA(A5, assay = "SCT", verbose = FALSE)
+B5 <- RunPCA(B5, assay = "SCT", verbose = FALSE)
+C5 <- RunPCA(C5, assay = "SCT", verbose = FALSE)
+D5 <- RunPCA(D5, assay = "SCT", verbose = FALSE)
+
+#Let's see how well the data is captured by the PCs
+ElbowPlot(B1)
+ElbowPlot(A2)
+ElbowPlot(B2)
+ElbowPlot(C2)
+ElbowPlot(D2)
+ElbowPlot(A3)
+ElbowPlot(B3)
+ElbowPlot(C3)
+ElbowPlot(D3)
+ElbowPlot(A4)
+ElbowPlot(B4)
+ElbowPlot(C4)
+ElbowPlot(D4)
+ElbowPlot(A5)
+ElbowPlot(B5)
+ElbowPlot(C5)
+ElbowPlot(D5)
+```
+```{r}
+#cleaning up environment a bit before moving on
+rm(alldata, counts)
+```
+```{r}
+#As in PhenoGraph, we first construct a KNN graph based on the euclidean distance in PCA space, and refine the edge weights between any two cells based on the shared overlap in their local neighborhoods (Jaccard similarity). 
+#This step is performed using the FindNeighbors() function, and takes as input the previously defined dimensionality of the dataset (first 20 PCs).
+B1 <- FindNeighbors(B1, reduction = "pca", dims = 1:20)
+B1 <- FindClusters(B1, verbose = FALSE)
+B1 <- RunUMAP(B1, reduction= "pca", dims = 1:20)
+
+
+A2 <- FindNeighbors(A2, reduction = "pca", dims = 1:20)
+A2 <- FindClusters(A2, verbose = FALSE)
+A2 <- RunUMAP(A2, reduction = "pca", dims = 1:20)
+B2 <- FindNeighbors(B2, reduction = "pca", dims = 1:20)
+B2 <- FindClusters(B2, verbose = FALSE)
+B2 <- RunUMAP(B2, reduction = "pca", dims = 1:20)
+C2 <- FindNeighbors(C2, reduction = "pca", dims = 1:20)
+C2 <- FindClusters(C2, verbose = FALSE)
+C2 <- RunUMAP(C2, reduction = "pca", dims = 1:20)
+D2 <- FindNeighbors(D2, reduction = "pca", dims = 1:20)
+D2 <- FindClusters(D2, verbose = FALSE)
+D2 <- RunUMAP(D2, reduction = "pca", dims = 1:20)
+
+
+A3 <- FindNeighbors(A3, reduction = "pca", dims = 1:20)
+A3 <- FindClusters(A3, verbose = FALSE)
+A3 <- RunUMAP(A3, reduction = "pca", dims = 1:20)
+B3 <- FindNeighbors(B3, reduction = "pca", dims = 1:20)
+B3 <- FindClusters(B3, verbose = FALSE)
+B3 <- RunUMAP(B3, reduction = "pca", dims = 1:20)
+C3 <- FindNeighbors(C3, reduction = "pca", dims = 1:20)
+C3 <- FindClusters(C3, verbose = FALSE)
+C3 <- RunUMAP(C3, reduction = "pca", dims = 1:20)
+D3 <- FindNeighbors(D3, reduction = "pca", dims = 1:20)
+D3 <- FindClusters(D3, verbose = FALSE)
+D3 <- RunUMAP(D3, reduction = "pca", dims = 1:20)
+
+
+A4 <- FindNeighbors(A4, reduction = "pca", dims = 1:20)
+A4 <- FindClusters(A4, verbose = FALSE)
+A4 <- RunUMAP(A4, reduction = "pca", dims = 1:20)
+B4 <- FindNeighbors(B4, reduction = "pca", dims = 1:20)
+B4 <- FindClusters(B4, verbose = FALSE)
+B4 <- RunUMAP(B4, reduction = "pca", dims = 1:20)
+C4 <- FindNeighbors(C4, reduction = "pca", dims = 1:20)
+C4 <- FindClusters(C4, verbose = FALSE)
+C4 <- RunUMAP(C4, reduction = "pca", dims = 1:20)
+D4 <- FindNeighbors(D4, reduction = "pca", dims = 1:20)
+D4 <- FindClusters(D4, verbose = FALSE)
+D4 <- RunUMAP(D4, reduction = "pca", dims = 1:20)
+
+A5 <- FindNeighbors(A5, reduction = "pca", dims = 1:20)
+A5 <- FindClusters(A5, verbose = FALSE)
+A5 <- RunUMAP(A5, reduction = "pca", dims = 1:20)
+B5 <- FindNeighbors(B5, reduction = "pca", dims = 1:20)
+B5 <- FindClusters(B5, verbose = FALSE)
+B5 <- RunUMAP(B5, reduction = "pca", dims = 1:20)
+C5 <- FindNeighbors(C5, reduction = "pca", dims = 1:20)
+C5 <- FindClusters(C5, verbose = FALSE)
+C5 <- RunUMAP(C5, reduction = "pca", dims = 1:20)
+D5 <- FindNeighbors(D5, reduction = "pca", dims = 1:20)
+D5 <- FindClusters(D5, verbose = FALSE)
+D5 <- RunUMAP(D5, reduction = "pca", dims = 1:20)
+```
+```{r}
+#Visualizing the PCA analysis results in UMAP space
+plot00 <- DimPlot(B1, reduction = "umap", label = TRUE)
+plot01 <- DimPlot(A2, reduction = "umap", label = TRUE)
+plot02 <- DimPlot(B2, reduction = "umap", label = TRUE)
+plot03 <- DimPlot(C2, reduction = "umap", label = TRUE)
+plot04 <- DimPlot(D2, reduction = "umap", label = TRUE)
+plot05 <- DimPlot(A3, reduction = "umap", label = TRUE)
+plot06 <- DimPlot(B3, reduction = "umap", label = TRUE)
+plot07 <- DimPlot(C3, reduction = "umap", label = TRUE)
+plot08 <- DimPlot(D3, reduction = "umap", label = TRUE)
+plot09 <- DimPlot(A4, reduction = "umap", label = TRUE)
+plot10 <- DimPlot(B4, reduction = "umap", label = TRUE)
+plot11 <- DimPlot(C4, reduction = "umap", label = TRUE)
+plot12 <- DimPlot(D4, reduction = "umap", label = TRUE)
+plot13 <- DimPlot(A5, reduction = "umap", label = TRUE)
+plot14 <- DimPlot(B5, reduction = "umap", label = TRUE)
+plot15 <- DimPlot(C5, reduction = "umap", label = TRUE)
+plot16 <- DimPlot(D5, reduction = "umap", label = TRUE)
+```
+```{r}
+#Now that we have performed all quality control steps, we want to save each of these as new objects in .RDS formats
+saveRDS(B1, "B1.rds")
+saveRDS(A2, "A2.rds")
+saveRDS(B2, "B2.rds")
+saveRDS(C2, "C2.rds")
+saveRDS(D2, "D2.rds")
+saveRDS(A3, "A3.rds")
+saveRDS(B3, "B3.rds")
+saveRDS(C3, "C3.rds")
+saveRDS(D3, "D3.rds")
+saveRDS(A4, "A4.rds")
+saveRDS(B4, "B4.rds")
+saveRDS(C4, "C4.rds")
+saveRDS(D4, "D4.rds")
+saveRDS(A5, "A5.rds")
+saveRDS(B5, "B5.rds")
+saveRDS(C5, "C5.rds")
+saveRDS(D5, "D5.rds")
+```
