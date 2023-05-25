@@ -86,6 +86,7 @@ ctrl.integrated <- FindNeighbors(ctrl.integrated, reduction = "pca", dims = 1:30
 ctrl.integrated<- FindClusters(ctrl.integrated, resolution = 0.5)
 ```
 ```{r}
+##Supplemental Figure 4 code
 p00 <- DimPlot(wt.integrated, reduction = "umap", cols = c("#99CCFF","#9BDD00", "#FFCC66","#2562B6", "#FF6699",  "#FF9933", "#FF6666", "#CC99FF", "#CC6699", "#FF99CC",  "#990000",  "#A7E2C5", "#99CCCC",  "#CC9999", "#2E7D32", "#31DFEB", "grey", "#FFB5B5"))
 p01 <- DimPlot(wt.integrated, reduction = "umap", group.by = "orig.ident", cols = c("#99CCFF","#9BDD00", "#FFCC66","#2562B6", "#FF6699",  "#FF9933", "#FF6666", "#CC99FF", "#CC6699", "#FF99CC",  "#990000",  "#A7E2C5", "#99CCCC",  "#CC9999", "#2E7D32", "#31DFEB", "grey", "#FFB5B5"))
 p00+p01
