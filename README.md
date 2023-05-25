@@ -28,7 +28,7 @@ The following packages are required:
 "DESeq2"
 "RColorBrewer"
 "data.table"
-
+.
 
 Please reach out to Karen Serrano at karenserrano@lbl.gov or Margot Bezrutcyzk at mbezrutczyk@lbl.gov for any questions.
 
