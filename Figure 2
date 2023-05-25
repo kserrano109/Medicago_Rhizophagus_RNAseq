@@ -1,1 +1,182 @@
+```{r}
+#loading in packages and robjects
+#loading necessary packages
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+library(dplyr)
+library(here)
+library(tidyverse)
+library(viridis)
+library(RColorBrewer)
+options (future.globals.maxSize = 4000 * 1024^5)
 
+#loading in nuclei and spatial mycorrhizal objects
+myc.nuc <- readRDS("CORRECT PATH HERE!")
+myc.integrated <- readRDS('/global/homes/k/kserrano/Desktop/myc.integrated.rds')
+```
+```{r}
+# specify that we will perform downstream analysis on the corrected data note that the
+# original unmodified data still resides in the 'RNA' assay
+DefaultAssay(myc.integrated) <- "integrated"
+DefaultAssay(myc.nuc) <- "integrated"
+
+# Run the standard workflow for visualization and clustering
+myc.integrated <- RunPCA(myc.integrated, npcs = 30, verbose = FALSE)
+myc.integrated <- RunUMAP(myc.integrated, reduction = "pca",verbose = FALSE, dims = 1:30, metric ="cosine")
+myc.integrated <- FindNeighbors(myc.integrated, reduction = "pca", dims = 1:30)
+myc.integrated <- FindClusters(myc.integrated, resolution = 0.5)
+
+myc.nuc <- RunPCA(myc.nuc, npcs = 30, verbose = FALSE)
+myc.nuc <- RunUMAP(myc.nuc, reduction = "pca",verbose = FALSE, dims = 1:30, metric ="cosine")
+myc.nuc <- FindNeighbors(myc.nuc, reduction = "pca", dims = 1:30)
+myc.nuc <- FindClusters(myc.nuc, resolution = 0.5)
+```
+```{r}
+p00 <- DimPlot(myc.integrated, reduction = "umap", cols = c("#FF9999",
+"#FF6666",
+"#FFCC66",
+"#FF6699",
+"#CC99FF",
+"#CC6699",
+"#99CCFF",
+"#ff9933",
+"#FF99FF",
+"#FF99CC",
+"#99CCCC",
+"#66CC99",
+"#CC6600",
+"#FFCCCC",
+"#339966",
+"#CCCCCC",
+"#CC9999",
+"#996666",
+"#FFFF99"))
+p01 <- DimPlot(myc.integrated, reduction = "umap", group.by = "orig.ident", cols= c("#FF9999",
+"#FF6666",
+"#FFCC66",
+"#FF6699",
+"#CC99FF",
+"#CC6699",
+"#99CCFF",
+"#ff9933",
+"#FF99FF",
+"#FF99CC",
+"#99CCCC",
+"#66CC99",
+"#CC6600",
+"#FFCCCC",
+"#339966",
+"#CCCCCC",
+"#CC9999",
+"#996666",
+"#FFFF99"))
+p00+p01
+
+#p02 <- DimPlot(myc.nuc, reduction = "umap",  group.by = "cell_type",   cols = c("#FF9999",
+"#FF6666",
+"#FFCC66",
+"#FF6699",
+"#CC99FF",
+"#CC6699",
+"#99CCFF",
+"#ff9933",
+"#FF99FF",
+"#FF99CC",
+"#99CCCC",
+"#66CC99",
+"#CC6600",
+"#FFCCCC",
+"#339966",
+"#CCCCCC",
+"#CC9999",
+"#996666",
+"#FFFF99"))
+#p03 <- DimPlot(myc.nuc, reduction = "umap", group.by = "orig.ident", cols= c("#FF9999",
+"#FF6666",
+"#CC99FF",
+"#FF6699",
+"#ff9933",
+"#FFCC66",
+"#CC6699",
+"#99CCCC",
+"#66CC99",
+"#FF99FF",
+"#FF99CC",
+"#99CCFF",
+"#990000",
+"#FFCCCC",
+"#CC9999",
+"#996666"))
+p02+p03
+```
+```{r}
+#Figure 2 panel B code
+##First, let's make a list of AM marker genes
+am.markers <-c('A17-----------MTR-5g037343',
+'A17-----------MTR-0041s0030', #early
+'A17-----------MTR-7g117580', #early 
+'A17-----------MTR-7g100110', #early
+'A17-----------MTR-5g026850', #early
+'A17-----------MTR-1g112940', #early 
+'A17-----------MTR-3g109610', #early 
+'A17-----------MTR-3g097560',  #early 
+'A17-----------MTR-7g090020', #early 
+'A17-----------MTR-5g029650', #middle
+'A17-----------MTR-4g022570', #middle 
+'A17-----------MTR-3g079630', #middle 
+'A17-----------MTR-1g028600', #middle 
+'A17-----------MTR-1g017910', #middle 
+'A17-----------MTR-8g068265', #middle 
+'A17-----------MTR-1g109110', #middle 
+'A17-----------MTR-1g090920', #middle 
+'A17-----------MTR-1g078400', #middle 
+'A17-----------MTR-4g070970', #middle 
+'A17-----------MTR-1g040500', #middle 
+'A17-----------MTR-7g027190', #middle 
+'A17-----------MTR-4g104020', #middle 
+'A17-----------MTR-3g065980', #middle 
+'A17-----------MTR-8g074750', #middle 
+'A17-----------MTR-8g006790', #middle 
+'A17-----------MTR-6g027840', #middle 
+'A17-----------MTR-5g030910', #middle 
+'A17-----------MTR-7g068600', #late 
+'A17-----------MTR-8g012805', #late 
+'R.irregularis-RIR-0168300', #RiEF1a
+'R.irregularis-RIR-3143500', #RiNST1
+"R.irregularis-RIR-2656400" #RiFTR1
+               )
+DotPlot(
+  myc.integrated,
+  assay = "SCT",
+  features =am.markers,  
+  cols = c("darkblue", "red"),
+  col.min = -3,
+  col.max = 3,
+  dot.min = 0,
+  dot.scale = 10,
+  idents = NULL,
+  group.by = NULL,
+  split.by = NULL,
+  cluster.idents = TRUE,
+  scale = TRUE,
+  scale.by = "radius"
+) + RotatedAxis()
+```
+```{r}
+##code for panel 2c
+#Integrating single nuclei myc and spatial myc datasets
+anchors <- FindTransferAnchors(reference = myc.nuc, query = myc.integrated, normalization.method = "SCT")
+imputation.assay <- TransferData(anchorset = anchors, refdata = GetAssayData(myc.nuc[['RNA']]),
+weight.reduction = myc.integrated[["pca"]], dims = 1:30)
+myc.integrated[["imputation"]] <- imputation.assay
+DefaultAssay(myc.integrated) <- "imputation"
+
+#for example, these genes were not detected in the spatial assay, but their location can now be predicted based on concurrently expressed genes in the single cell/single nucleus data
+p04 <- SpatialPlot(myc.integrated, features = "A17-----------MTR-0041s0030", images = "slice1.2", alpha =0.5) + scale_fill_viridis_c() #Skl1
+p05 <- SpatialPlot(myc.integrated, features = "A17-----------MTR-7g117580", images = "slice1.2", alpha =0.5) + scale_fill_viridis_c() #DMI1
+
+#lets now save it as svg
+ggsave(file="figure2panelc1.svg", plot=p04, width=12, height=10)
+ggsave(file="figure2panelc2.svg", plot=p05, width=12, height=10)
+```
