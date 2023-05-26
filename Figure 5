@@ -1,3 +1,4 @@
+```{r}
 #loading in packages and robjects
 #loading necessary packages
 library(Seurat)
@@ -29,7 +30,7 @@ D3 <- readRDS("/global/homes/k/kserrano/Desktop/Spatial_Objects/D3.rds")
 myc.merge <- merge(B1, y = c(B2, B3, A2, A3, C2, C3, D2, D3), add.cell.ids = c("B1", "B2", "B3", "A2", "A3", "C2", "C3", "D2", "D3"))
 myc.merge
 ```
-
+```{r}
 #getting a list of all genes expressed in this merged object and their expression values
 #figure 5 panel a - getting list to compare to previous datasets
 apply(myc.merge@assays$Spatial@data,1,mean) -> gene.expression.myc
@@ -38,7 +39,7 @@ as.data.frame(gene.expression.myc) -> mycexp
 head(mycexp)
 write.csv(mycexp, "/global/homes/k/kserrano/Desktop/mycexp.csv")
 ```
-
+```{r}
 #figure 5 panel d
 #plotting dimplot for a particular gene
 sobj <- myc.integrated
