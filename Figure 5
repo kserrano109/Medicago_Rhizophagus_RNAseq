@@ -1,1 +1,115 @@
+#loading in packages and robjects
+#loading necessary packages
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+library(dplyr)
+library(here)
+library(tidyverse)
+library(viridis)
+library(RColorBrewer)
+library(datasets)
+library(readxl)
+library(lattice)                              
+library("reshape2")
+options (future.globals.maxSize = 4000 * 1024^5)
 
+#loading in mycorrhizal spatial objects individually
+B1 <- readRDS("/global/homes/k/kserrano/Desktop/Spatial_Objects/B1.rds")
+B2 <- readRDS("/global/homes/k/kserrano/Desktop/Spatial_Objects/B2.rds")
+B3 <- readRDS("/global/homes/k/kserrano/Desktop/Spatial_Objects/B3.rds")
+A2 <- readRDS("/global/homes/k/kserrano/Desktop/Spatial_Objects/A2.rds")
+A3 <- readRDS("/global/homes/k/kserrano/Desktop/Spatial_Objects/A3.rds")
+C2 <- readRDS("/global/homes/k/kserrano/Desktop/Spatial_Objects/C2.rds")
+C3 <- readRDS("/global/homes/k/kserrano/Desktop/Spatial_Objects/C3.rds")
+D2 <- readRDS("/global/homes/k/kserrano/Desktop/Spatial_Objects/D2.rds")
+D3 <- readRDS("/global/homes/k/kserrano/Desktop/Spatial_Objects/D3.rds")
+
+#merging into a single object
+myc.merge <- merge(B1, y = c(B2, B3, A2, A3, C2, C3, D2, D3), add.cell.ids = c("B1", "B2", "B3", "A2", "A3", "C2", "C3", "D2", "D3"))
+myc.merge
+```
+
+#getting a list of all genes expressed in this merged object and their expression values
+#figure 5 panel a - getting list to compare to previous datasets
+apply(myc.merge@assays$Spatial@data,1,mean) -> gene.expression.myc
+sort(gene.expression.myc, decreasing = TRUE) -> gene.expression.myc
+as.data.frame(gene.expression.myc) -> mycexp
+head(mycexp)
+write.csv(mycexp, "/global/homes/k/kserrano/Desktop/mycexp.csv")
+```
+
+#figure 5 panel d
+#plotting dimplot for a particular gene
+sobj <- myc.integrated
+#ggplot function
+get_reduction <- function(sobj, reduction_name) {
+  rd <- Embeddings(sobj, reduction = reduction_name) %>% 
+    as_tibble(rownames = "Cell")
+}
+
+get_cell_data <- function(sobj, features = NULL, melt = TRUE) {
+  md <- as_tibble(sobj@meta.data, rownames = "Cell")
+  reducs <- names(sobj@reductions)
+  rd <- map(reducs, get_reduction, sobj = sobj) %>% reduce(left_join)
+  combined_data <- left_join(md, rd)
+  if(!is.null(features)) {
+    exp_data <- GetAssayData(sobj[features,], slot = "counts", assay = "Spatial") %>% 
+      Matrix::t() %>% 
+      as_tibble(rownames = "Cell")
+    if(melt) {
+      exp_data <- gather(exp_data, "Locus", "Counts", -Cell)
+    }
+    combined_data <- left_join(combined_data, exp_data)
+  }
+  return(combined_data)
+}
+
+## Plot by expression
+features <- c("R.irregularis-RIR-2656400") #RiFTR1
+cell_data <- get_cell_data(sobj, features = features)
+ggplot(arrange(cell_data, Counts), aes(x = UMAP_1, y = UMAP_2)) +
+  geom_point(aes(color = log1p(Counts)),size=0.5) +
+  scale_color_viridis_c(name = "Log(Counts + 1)", option = "plasma") +
+  labs(x = "UMAP 1", y = "UMAP 2") +
+  facet_wrap("Locus") +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank())
+
+ggsave("RiFTR1.pdf", plot=last_plot(), device="pdf", width = 5.5, height = 4, units="in", dpi = 300)
+
+## Plot by expression
+features <- c("R.irregularis-RIR-0168300") #RiEF1a
+cell_data <- get_cell_data(sobj, features = features)
+ggplot(arrange(cell_data, Counts), aes(x = UMAP_1, y = UMAP_2)) +
+  geom_point(aes(color = log1p(Counts)),size=0.5) +
+  scale_color_viridis_c(name = "Log(Counts + 1)", option = "plasma") +
+  labs(x = "UMAP 1", y = "UMAP 2") +
+  facet_wrap("Locus") +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank())
+
+ggsave("RiEF1a.pdf", plot=last_plot(), device="pdf", width = 5.5, height = 4, units="in", dpi = 300)
+
+## Plot by expression
+features <- c("R.irregularis-RIR-1036900") #Rihypothetical
+cell_data <- get_cell_data(sobj, features = features)
+ggplot(arrange(cell_data, Counts), aes(x = UMAP_1, y = UMAP_2)) +
+  geom_point(aes(color = log1p(Counts)),size=0.5) +
+  scale_color_viridis_c(name = "Log(Counts + 1)", option = "plasma") +
+  labs(x = "UMAP 1", y = "UMAP 2") +
+  facet_wrap("Locus") +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank())
+
+ggsave("Rihyp.pdf", plot=last_plot(), device="pdf", width = 5.5, height = 4, units="in", dpi = 300)
+```
