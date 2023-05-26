@@ -12,6 +12,27 @@ library(viridis)
 library(RColorBrewer)
 library(Seurat.utils)
 options (future.globals.maxSize = 4000 * 1024^5)
+
+#adding in color palette
+farmer_colors = c("#FF9999",
+"#FF6666",
+"#FFCC66",
+"#FF6699",
+"#CC99FF",
+"#CC6699",
+"#99CCFF",
+"#ff9933",
+"#FF99FF",
+"#FF99CC",
+"#99CCCC",
+"#66CC99",
+"#CC6600",
+"#FFCCCC",
+"#339966",
+"#CCCCCC",
+"#CC9999",
+"#996666",
+"#FFFF99")
 ```
 ```{r}
 #loading in spatial objects
@@ -32,6 +53,26 @@ A5 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/A5.rds')
 B5 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/B5.rds')
 C5 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/C5.rds')
 D5 <- readRDS('/global/homes/k/kserrano/Desktop/Spatial_Objects/D5.rds')
+
+#adding in original identity metadata
+B1@meta.data['dataset'] = 'B1'
+A2@meta.data['dataset'] = 'A2'
+B2@meta.data['dataset'] = 'B2'
+C2@meta.data['dataset'] = 'C2'
+D2@meta.data['dataset'] = 'D2'
+A3@meta.data['dataset'] = 'A3'
+B3@meta.data['dataset'] = 'B3'
+C3@meta.data['dataset'] = 'C3'
+D3@meta.data['dataset'] = 'D3'
+A4@meta.data['dataset'] = 'A4'
+B4@meta.data['dataset'] = 'B4'
+C4@meta.data['dataset'] = 'C4'
+D4@meta.data['dataset'] = 'D4'
+A5@meta.data['dataset'] = 'A5'
+B5@meta.data['dataset'] = 'B5'
+C5@meta.data['dataset'] = 'C5'
+D5@meta.data['dataset'] = 'D5'
+
 
 #assigning objects to lists for integration
 wt.list <-c(B1,A2,B2,C2,D2,A3,B3,C3,D3,A4,B4,C4,D4,A5,B5,C5,D5)
@@ -87,15 +128,15 @@ ctrl.integrated<- FindClusters(ctrl.integrated, resolution = 0.5)
 ```
 ```{r}
 ##Supplemental Figure 4 code
-p00 <- DimPlot(wt.integrated, reduction = "umap", cols = c("#99CCFF","#9BDD00", "#FFCC66","#2562B6", "#FF6699",  "#FF9933", "#FF6666", "#CC99FF", "#CC6699", "#FF99CC",  "#990000",  "#A7E2C5", "#99CCCC",  "#CC9999", "#2E7D32", "#31DFEB", "grey", "#FFB5B5"))
-p01 <- DimPlot(wt.integrated, reduction = "umap", group.by = "orig.ident", cols = c("#99CCFF","#9BDD00", "#FFCC66","#2562B6", "#FF6699",  "#FF9933", "#FF6666", "#CC99FF", "#CC6699", "#FF99CC",  "#990000",  "#A7E2C5", "#99CCCC",  "#CC9999", "#2E7D32", "#31DFEB", "grey", "#FFB5B5"))
+p00 <- DimPlot(wt.integrated, reduction = "umap", cols = farmer_colors)
+p01 <- DimPlot(wt.integrated, reduction = "umap", group.by = "dataset", cols = farmer_colors)
 p00+p01
 
-p02 <- DimPlot(myc.integrated, reduction = "umap", cols = c("#99CCFF","#9BDD00", "#FFCC66","#2562B6", "#FF6699",  "#FF9933", "#FF6666", "#CC99FF", "#CC6699", "#FF99CC",  "#990000",  "#A7E2C5", "#99CCCC",  "#CC9999", "#2E7D32", "#31DFEB", "grey", "#FFB5B5"))
-p03 <- DimPlot(myc.integrated, reduction = "umap", group.by = "orig.ident", cols = c("#99CCFF","#9BDD00", "#FFCC66","#2562B6", "#FF6699",  "#FF9933", "#FF6666", "#CC99FF", "#CC6699", "#FF99CC",  "#990000",  "#A7E2C5", "#99CCCC",  "#CC9999", "#2E7D32", "#31DFEB", "grey", "#FFB5B5"))
+p02 <- DimPlot(ctrl.integrated, reduction = "umap", cols = farmer_colors)
+p03 <- DimPlot(ctrl.integrated, reduction = "umap", group.by = "dataset", cols = farmer_colors)
 p02+p03
 
-p04 <- DimPlot(ctrl.integrated, reduction = "umap", cols = c("#99CCFF","#9BDD00", "#FFCC66","#2562B6", "#FF6699",  "#FF9933", "#FF6666", "#CC99FF", "#CC6699", "#FF99CC",  "#990000",  "#A7E2C5", "#99CCCC",  "#CC9999", "#2E7D32", "#31DFEB", "grey", "#FFB5B5"))
-p05 <- DimPlot(ctrl.integrated, reduction = "umap", group.by = "orig.ident", cols = c("#99CCFF","#9BDD00", "#FFCC66","#2562B6", "#FF6699",  "#FF9933", "#FF6666", "#CC99FF", "#CC6699", "#FF99CC",  "#990000",  "#A7E2C5", "#99CCCC",  "#CC9999", "#2E7D32", "#31DFEB", "grey", "#FFB5B5"))
+p04 <- DimPlot(myc.integrated, reduction = "umap", cols = farmer_colors)
+p05 <- DimPlot(myc.integrated, reduction = "umap", group.by = "dataset", cols = farmer_colors)
 p04+p05
 ```
