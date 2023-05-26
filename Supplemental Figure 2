@@ -13,7 +13,7 @@ library(datasets)
 library(readxl)
 library(lattice)                              
 library(reshape2)
-
+```
 ```{r}
 #Supplemental Figure 2 panel a
 qpcr <- read.csv("/global/homes/k/kserrano/Desktop/qpcr1.csv")
@@ -54,7 +54,7 @@ ggplot(qpcr_long, aes(x=factor(variable), y= value, fill=factor(Sample))) +
 
 # Close the graphics device
 dev.off() 
-
+```
 ```{r}
 #Supplemental Figure 2 Panel b
 col <- read.csv("/global/homes/k/kserrano/Desktop/col1.csv")
@@ -97,3 +97,4 @@ ggplot(col_long, aes(x = variable, y = value, fill = Treatment)) +  # ggplot fun
 
 # Close the graphics device
 dev.off() 
+```
