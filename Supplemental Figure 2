@@ -1,0 +1,96 @@
+#loading in packages and robjects
+#loading necessary packages
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+library(dplyr)
+library(here)
+library(tidyverse)
+library(viridis)
+library(RColorBrewer)
+library(datasets)
+library(readxl)
+library(lattice)                              
+library(reshape2)
+
+#Supplemental Figure 2 panel a
+qpcr <- read.csv("/global/homes/k/kserrano/Desktop/qpcr1.csv")
+str(qpcr)
+
+# analysis of variance
+anova1 <- aov(MtPT4 ~ Sample, data = qpcr)
+summary(anova1)
+anova2 <- aov(RiTUB ~ Sample, data = qpcr)
+summary(anova2)
+
+#reshaping data into long format
+qpcr_long <- melt(qpcr, id = "Sample")                      
+str(qpcr_long)
+
+#plotting, got rid of one outlier
+ggplot(qpcr_long, aes(x=factor(variable), y= value, fill=factor(Sample))) +
+  geom_boxplot() +
+  stat_boxplot(geom='errorbar') +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  labs(x="Gene", y="log(2^-∆∆Ct)") +
+  scale_fill_manual(values=c("#FFCC66", "#CC99FF")) + 
+ ylim(-2,6)
+
+#saving
+svg("qpcr.svg")
+
+# Code of the plot
+ggplot(qpcr_long, aes(x=factor(variable), y= value, fill=factor(Sample))) +
+  geom_boxplot() +
+  stat_boxplot(geom='errorbar') +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  labs(x="Gene", y="log(2^-∆∆Ct)") +
+  scale_fill_manual(values=c("#FFCC66", "#CC99FF")) + 
+ ylim(-2,6)
+
+# Close the graphics device
+dev.off() 
+
+#Supplemental Figure 2 Panel b
+col <- read.csv("/global/homes/k/kserrano/Desktop/col1.csv")
+str(col)
+
+# analysis of variance
+anova1 <- aov(F ~ Treatment, data = col)
+summary(anova1)
+anova2 <- aov(M ~ Treatment, data = col)
+summary(anova2)
+anova3 <- aov(A ~ Treatment, data = col)
+summary(anova3)
+anova4 <- aov(H ~ Treatment, data = col)
+summary(anova4)
+anova5 <- aov(V ~ Treatment, data = col)
+summary(anova5)
+
+ # Reshaping harvest1 data
+col_long <- melt(col, id = "Treatment")                     
+str(col_long)
+
+#plotting
+ggplot(col_long, aes(x = variable, y = value, fill = Treatment)) +  # ggplot function
+  geom_boxplot() +
+  stat_boxplot(geom='errorbar') +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  scale_fill_manual(values=c("#FFCC66", "#CC99FF")) 
+
+#saving
+svg("col.svg")
+
+# Code of the plot
+ggplot(col_long, aes(x = variable, y = value, fill = Treatment)) +  # ggplot function
+  geom_boxplot() +
+  stat_boxplot(geom='errorbar') +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  scale_fill_manual(values=c("#FFCC66", "#CC99FF")) 
+
+# Close the graphics device
+dev.off() 
