@@ -1,3 +1,4 @@
+```{r}
 #loading in packages and robjects
 #loading necessary packages
 library(Seurat)
@@ -13,6 +14,7 @@ library(readxl)
 library(lattice)                              
 library(reshape2)
 
+```{r}
 #Supplemental Figure 2 panel a
 qpcr <- read.csv("/global/homes/k/kserrano/Desktop/qpcr1.csv")
 str(qpcr)
@@ -53,6 +55,7 @@ ggplot(qpcr_long, aes(x=factor(variable), y= value, fill=factor(Sample))) +
 # Close the graphics device
 dev.off() 
 
+```{r}
 #Supplemental Figure 2 Panel b
 col <- read.csv("/global/homes/k/kserrano/Desktop/col1.csv")
 str(col)
