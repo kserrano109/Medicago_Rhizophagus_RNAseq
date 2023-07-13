@@ -1,14 +1,15 @@
 # Analysis of Medicago-AMF single-nuclei and spatial transcriptomics datasets
+***
 
 This is a repository for the publication "Spatial co-transcriptomics of the arbuscular mycorrhizal symbiosis" in which authors applied single-nuclei RNA-seq and spatial RNA-seq to the symbiosis between Medicago truncatula and Rhizophagus irregularis.
 
 ***
 
-## All figures can be produced using code found in the following juptyer notebooks:
+### All figures can be produced using code found in the following juptyer notebooks:
 
-sNucRNAseq_med_AMF.ipynb: Figure 1a, Figure 3a, Figure 3b, Figure 4b, Figure 4c, Supp. Sheet 4
-sNucRNAseq_med_all.ipynb: Supp Figure 3
-(karen add yours here)
+> sNucRNAseq_med_AMF.ipynb: Figure 1a, Figure 3a, Figure 3b, Figure 4b, Figure 4c, Supp. Sheet 4
+> sNucRNAseq_med_all.ipynb: Supp Figure 3
+> (karen add yours here)
 
 Fastq files, Cellranger and Spaceranger matrix files, and fully processed .RDS Seurat Object files can be download here: [INSERT LINK HERE].
 
