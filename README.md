@@ -1,5 +1,4 @@
-# Medicago_Rhizophagus_RNAseq
-## Analysis of Medicago root-AMF single-nuclei and spatial transcriptomics datasets
+# Analysis of Medicago-AMF single-nuclei and spatial transcriptomics datasets
 
 This is a repository for the publication "Spatial co-transcriptomics of the arbuscular mycorrhizal symbiosis" in which authors applied single-nuclei RNA-seq and spatial RNA-seq to the symbiosis between Medicago truncatula and Rhizophagus irregularis.
 
