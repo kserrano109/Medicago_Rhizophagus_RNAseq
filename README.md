@@ -1,4 +1,5 @@
 # Medicago_Rhizophagus_RNAseq
+## Analysis of Medicago root-AMF single-nuclei and spatial transcriptomics datasets
 
 This is a repository for the publication "Spatial co-transcriptomics of the arbuscular mycorrhizal symbiosis" in which authors applied single-nuclei RNA-seq and spatial RNA-seq to the symbiosis between Medicago truncatula and Rhizophagus irregularis.
 
@@ -35,8 +36,7 @@ The following packages are required: (maybe this can be removed since we have th
 "RColorBrewer"
 "data.table"
 
-# Analysis of Medicago root single nuclei Chromium datasets
-
+***
 
 For optimal reproducibility, it is best to use the docker image listed below rather than rely on packages downloaded locally. You may also find it necessary to use NERSC or a cloud computing platform to analyze larger datasets; below are instructions for pulling the docker image during an interactive R session on NERSC or in a NERSC-hosted Jupyter notebook (preferred but a few more steps to set up). 
 
