@@ -1,19 +1,21 @@
 # Analysis of Medicago-AMF single-nuclei and spatial transcriptomics datasets
-***
+
 
 This is a repository for the publication "Spatial co-transcriptomics of the arbuscular mycorrhizal symbiosis" in which authors applied single-nuclei RNA-seq and spatial RNA-seq to the symbiosis between Medicago truncatula and Rhizophagus irregularis.
 
 ***
 
-### All figures can be produced using code found in the following juptyer notebooks:
+### All figures can be produced using code found in the following Juptyer Notebooks:
 
-> sNucRNAseq_med_AMF.ipynb: Figure 1a, Figure 3a, Figure 3b, Figure 4b, Figure 4c, Supp. Sheet 4
-> sNucRNAseq_med_all.ipynb: Supp Figure 3
-> (karen add yours here)
+1. sNucRNAseq_med_AMF.ipynb: Figure 1a, Figure 3a, Figure 3b, Figure 4b, Figure 4c, Supp. Sheet 4  
+2. sNucRNAseq_med_all.ipynb: Supp Figure 3  
+3. (karen add yours here)  
 
 Fastq files, Cellranger and Spaceranger matrix files, and fully processed .RDS Seurat Object files can be download here: [INSERT LINK HERE].
 
-The following packages are required: (maybe this can be removed since we have the bcoli docker image info below?)
+The following packages are required:  
+(maybe this can be removed since we have the bcoli docker image info below?)  
+  
 "Seurat"
 "ggplot2"
 "patchwork"
@@ -42,7 +44,7 @@ For optimal reproducibility, it is best to use the docker image listed below rat
 
 ***
 
-## Very basic instructions for pulling a docker image that supports these R Notebooks:
+## Very basic instructions for pulling a docker image that supports these Jupyter Notebooks:
 
 1. docker is installed on your computer and running (might as well be the latest version)
 2. adjust docker preferences>resources to at least 8GB memory and at least 16GB disk image size
