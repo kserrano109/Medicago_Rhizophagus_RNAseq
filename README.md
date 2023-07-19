@@ -11,7 +11,7 @@ This is a repository for the publication "Spatial co-transcriptomics of the arbu
 2. sNucRNAseq_med_all.ipynb: Supp Figure 3  
 3. spatialRNAseq_pre_integration.ipynb: spatial data conversion into seurat object + filtering/normalization
 4. spatialRNAseq_integration.ipynb: spatial object integration, Supp Figure 4
-5. spatialRNAseq_post_integration.ipynb: Figure 2b, Figure 2c, Figure 4b, Figure 5c
+5. spatialRNAseq_post_integration.ipynb: Figure 2b, Figure 2c, Figure 4a (data), Figure 4b, Figure 5c
 6. colonizationanalysis.ipynb: Supp Figure 2   
 
 Fastq files, Cellranger and Spaceranger matrix files, and fully processed .RDS Seurat Object files can be download here: [INSERT LINK HERE].
