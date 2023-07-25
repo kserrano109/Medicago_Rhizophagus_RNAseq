@@ -100,7 +100,7 @@ this kernel.json should contain the following:
 Go to 'jupyter.nersc.gov' and select a CPU (shared or exclusive) on Perlmutter– this kernel should now be available
 
 ### R objects identities: 
-see [doc][(https://docs.google.com/spreadsheets/d/1qOwmLMpmt2HH15gKPDxhaYfOm3qaqwchRPpiCUTjFzI/edit?usp=sharing)]
+see [doc](https://docs.google.com/spreadsheets/d/1qOwmLMpmt2HH15gKPDxhaYfOm3qaqwchRPpiCUTjFzI/edit?usp=sharing)
 ### reference genomes:
 Medicago truncatula genome assembly and annotation: MedtrA17_4.0
 
