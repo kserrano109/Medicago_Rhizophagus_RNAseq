@@ -14,7 +14,7 @@ This is a repository for the publication "Spatial Co-transcriptomics Reveals Dis
 5. spatialRNAseq_post_integration.ipynb: Figure 2b, Figure 2c, Figure 4a (data), Figure 4b, Figure 5c
 6. colonizationanalysis.ipynb: Supp Figure 2   
 
-Fastq files, Cellranger and Spaceranger matrix files, and fully processed .RDS Seurat Object files can be downloaded [here] ([https://www.ncbi.nlm.nih.gov/geo/info/linking.html](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE240107)).
+Fastq files, Cellranger and Spaceranger matrix files, and fully processed .RDS Seurat Object files can be downloaded here:  https://www.ncbi.nlm.nih.gov/geo/info/linking.html](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE240107.
 
 The following packages are required:  
 "Seurat"
